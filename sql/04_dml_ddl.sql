@@ -8,15 +8,19 @@ DESC EMP;
 
 -- INSERT
 # 새로운 사원 등록 - 단일행
-
-
+-- insert into emp
+-- values (9999, 'YANGHO', null, null, default, 9999, 9999, 10);
 
 # 새로운 사원 등록(사원번호, 사원이름, 월급여) - 다중행
-
+-- insert into emp(empno, ename, sal)
+-- values (8001, 'JANE', 4500),
+-- 		(8002, 'TOM', 4700);
 
 -- UPDATE
 # 사번이 8001번인 사원의 부서번호를 30번으로 수정
-
+update emp
+set deptno = 30
+where empno = 8001;
 
 
 # 사번이 8002번인 사원의 부서번호와 직무를 8000번 사원과 같게 수정
@@ -25,12 +29,15 @@ DESC EMP;
 
 -- insert or update
 # 8003번에 3500의 월급여를 받는 MICKY 사원이 없으면 추가하고 있으면 CLERK 직무와 부서번호 30번으로 UPDATE
-
+insert into emp(empno, ename, sal)
+values (8003, 'MICKY', 3500)
+on duplicate key update job = 'CLERK', deptno = 30;
 
 
 -- DELETE
 # 8000번 이상 사번을 갖는 사원 삭제
-
+delete from emp
+where empno >= 8000;
 
 
 ----------------------------------------------------------
@@ -45,7 +52,7 @@ DESC EMP;
 
 
 
-use testdb;
+-- use testdb;
 
 # test_emp 테이블 생성(사원번호,이름,이메일,월급여,나이,부서번호)
 # 사원번호(empno): 정수, PK 자동증가키
