@@ -149,31 +149,41 @@ USE SSAFYDB;
 
 -- CASE2) 보안상 특정 레코드나 컬럼만 조회하도록
 # 10번부서의 사원들의 사번, 이름, 부서번호, 월급여만 조회하는 v_emp2뷰 생성
-
+create or replace view v_emp2(eno, enm, dno, sal)
+as select empno, ename, deptno, sal
+from emp
+where deptno = 10;
 
 
 # v_emp2뷰 사용하여 데이터 조회
-
+select *
+from v_emp2;
 
 
 # v_emp2뷰 사용하여 데이터 삽입 
+insert into v_emp2
+values (9999, 'ssafy', 40, 5000);
 
-
-
+insert into v_emp2
+values (9998, 'ssafy2', 10, 5000);
 
 # 10번 부서에서 근무하는 사원들의 사원번호, 사원이름, 부서번호, 월급여 조회하는 v_emp2 뷰 생성
 # with check option
-
-
+create or replace view v_emp2(eno, enm, dno, sal)
+as select empno, ename, deptno, sal
+from emp
+where deptno = 10
+with check option;
 
 
 # v_emp2 뷰를 이용한 데이터 삽입 시도
-
-
-
+insert into v_emp2
+values (9997, 'ssafy3', 10, 5000);
 
 # v_emp2뷰를 이용한 데이터 수정 시도
-
+update v_emp2
+set dno = 40
+where eno = 7839;
 
 
 
