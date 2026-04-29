@@ -9,7 +9,13 @@ USE ssafydb;
 
 
 # 이름이 'SMITH'인 사원보다 나중에 입사한 사원이름, 입사일 조회                      
-
+select ename, deptno
+from emp
+where hiredate > (
+					select hiredate
+					from emp
+                    where ename = 'SMTIH'
+);
 
 
 # 이름이 'SMITH'인 사원의 급여보다 많은 급여를 받는 사원이름, 월급여 조회
@@ -21,19 +27,49 @@ USE ssafydb;
 --------------------------------------------------
 
 # 상사(관리자)인 사원번호, 사원이름 조회
+# 상사 목록을 구하고 자신이 그 상사 목록에 포함되어 있으면 상사인 사원이 됨.
+select 	distinct mgr
+from	emp;
+
+select empno, ename
+from emp
+where empno	in (
+					select distinct mgr
+					from emp
+				);
+# = any랑 in이랑은 같은 연산이다!
+
 
 
 
 # 상사(관리자)가 아닌 사원번호, 사원이름 조회
-
+select 	empno, ename
+from 	emp
+where 	empno not in (
+					select	distinct mgr
+					from	emp
+					where	mgr is not null
+				);
 
 
 # SALESMAN의 최저월급여보다 월급여가 많은 사원이름, 월급여 조회
-
+select 	empno, sal
+from	emp
+where 	sal > any(
+				select 	sal
+				from	emp
+				where 	job = 'SALESMAN'
+			);
 
 
 # SALESMAN의 최대월급여보다 월급여가 적은 사원이름, 월급여 조회
-
+select 	empno, sal
+from	emp
+where 	sal < any(
+				select 	sal
+				from	emp
+				where 	job = 'SALESMAN'
+			);
 
         
 # SALESMAN의 최대월월급여보다 급여가 많은 사원이름, 월급여 조회
@@ -44,14 +80,18 @@ USE ssafydb;
 
 
 
-
-
 --------------------------------------------------
 --- EXISTS 연산자
 --------------------------------------------------
 
 # 상사(관리자)인 사원번호, 사원이름 조회 
-
+select 	empno, ename
+from	emp m
+where 	exists (
+					select 	1
+					from 	emp e
+                    where 	m.empno = e.mgr
+				);
 
 
 # 상사(관리자)가 아닌 사원번호, 사원이름 조회 
@@ -74,8 +114,9 @@ USE ssafydb;
 
 # 사원이름, 월급여, 부서번호, 자신의 부서의 평균 월급여와 전사원 평균 월급여 조회
 
-
-
+select	ename, sal, deptno, (select avg(sal) from emp e2 where e2.deptno = e.deptno) as 부서평균,
+							(select avg(sal) from emp) as 전사원평균
+from emp e;
 
 --------------------------------------------------
 --- 인라인 뷰 
