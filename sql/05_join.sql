@@ -6,19 +6,26 @@ USE ssafydb;
 
 # 사원이름과 부서이름 조회
 # join ~ using
-
-
+select e.ename, e.deptno, d.deptno, d.dname
+from emp as e
+join dept as d
+on(e.deptno = d.deptno);
 
 # join ~ on : 테이블이름 활용
 
 
 
 # join ~ on : 테이블별칭 활용
-
+select e.ename, e.deptno, d.deptno, d.dname
+from emp as e
+join dept as d
+on(e.deptno = d.deptno);
 
 
 # 함축형
-
+select e.ename, d.deptno, d.dname
+from emp e, dept d
+where e.deptno = d.deptno;
 
 
 # 사원이름과 부서이름, 부서번호 조회
@@ -34,7 +41,10 @@ USE ssafydb;
 ---------------------------------------------------------------
 
 # 사원의 이름, 월급여, 급여 등급 조회
-
+select ename, sal, grade
+from emp
+join salgrade
+on sal between losal and hisal;
 
 
 ---------------------------------------------------------------
@@ -43,19 +53,24 @@ USE ssafydb;
 
 # TEST DATA INSERT
 
-  	INSERT INTO emp(empno, ename, sal, deptno, hiredate) 
-	VALUES(9998,'TAEHEE',12000,20,now());
-	INSERT INTO emp(empno, ename, sal, hiredate)
-	VALUES(9999,'SSAFY',7000,now());
+  	-- INSERT INTO emp(empno, ename, sal, deptno, hiredate) 
+	-- VALUES(9998,'TAEHEE',12000,20,now());
+	-- INSERT INTO emp(empno, ename, sal, hiredate)
+	-- VALUES(9999,'SSAFY',7000,now());
  
 
 
 # 월급여 구간을 벗어나는 사원도 포함 하여 사원 이름, 월급여, 급여 등급 조회
-
+select ename, sal, grade
+from emp
+left join salgrade
+on sal between losal and hisal;
 
 
 # 부서 배치 받지 못한 사원까지 포함하여 모든 사원 이름, 부서 이름 조회
-
+select ename, dname
+from dept
+right join emp using(deptno);
 
 
 # 부서 배치 받지 못한 사원까지 포함하여 모든 사원 이름, 부서 이름 조회(부서 이름 없을 경우 '해당부서없음')
@@ -91,7 +106,10 @@ USE ssafydb;
 ---------------------------------------------------------------
 
 # 모든 사원의 이름과 자신의 상사(관리자) 이름을 함께 조회
-
+select e.ename, ifnull(m.ename, '상사 없음')
+from emp as e
+left join emp as m
+on e.mgr = m.empno;
 
 
 # 상사(관리자)인 사원의 사번과 이름 조회
