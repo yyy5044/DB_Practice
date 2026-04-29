@@ -118,26 +118,74 @@ select	ename, sal, deptno, (select avg(sal) from emp e2 where e2.deptno = e.dept
 							(select avg(sal) from emp) as 전사원평균
 from emp e;
 
---------------------------------------------------
---- 인라인 뷰 
---------------------------------------------------
+-- ------------------------------------------------
+-- - 인라인 뷰 
+-- ------------------------------------------------
 
 # 각 부서에서 최대급여를 받는 사원번호, 월급여, 사원이름 조회
+select 		deptno, job, count(*)
+from		emp
+group by	deptno, job;
 
+# step1.
+select 		deptno,
+			count(if (job='CLERK', sal, null)) as CLERK,
+			count(if (job='MANAGER', sal, null)) as MANAGER,
+			count(if (job='PRESIDENT', sal, null)) as PRESIDENT,
+			count(if (job='ANALYST', sal, null)) as ANALYST,
+			count(if (job='SALESMAN', sal, null)) as SALESMAN
+from 		emp
+group by 	deptno;
 
 
 # 부서별, 직무별 사원 수 피봇테이블 조회(서브쿼리(inline-VIEW) 이용버전)
-
+select 	deptno, 
+		count(CLERK) as CLERK,
+        count(MANAGER) as MANAGER,
+        count(PRESIDENT) as PRESIDENT,
+        count(ANALYST) as ANALYST,
+        count(SALESMAN) as SALESMAN
+from (
+	select 	ename, deptno, job,
+			if (job='CLERK', sal, null) as CLERK,
+			if (job='MANAGER', sal, null) as MANAGER,
+			if (job='PRESIDENT', sal, null) as PRESIDENT,
+			if (job='ANALYST', sal, null) as ANALYST,
+			if (job='SALESMAN', sal, null) as SALESMAN
+	from 	emp
+) as e
+group by deptno;
 
 
 # 부서별, 직무별 월급여 평균 피봇테이블 조회(서브쿼리(inline-VIEW) 이용버전)
-
+select 	deptno, 
+		avg(CLERK) as CLERK,
+        avg(MANAGER) as MANAGER,
+        avg(PRESIDENT) as PRESIDENT,
+        avg(ANALYST) as ANALYST,
+        avg(SALESMAN) as SALESMAN
+from (
+	select 	ename, deptno, job,
+			if (job='CLERK', sal, null) as CLERK,
+			if (job='MANAGER', sal, null) as MANAGER,
+			if (job='PRESIDENT', sal, null) as PRESIDENT,
+			if (job='ANALYST', sal, null) as ANALYST,
+			if (job='SALESMAN', sal, null) as SALESMAN
+	from 	emp
+) as e
+group by deptno;
 
 
 # 부서별, 직무별 사원수 조회 피봇테이블 with 총계 조회 (서브쿼리(inline-VIEW) 이용버전)
-
-
-
+create view v_emp_dept_job
+as
+	select ename, deptno, job,
+			if (job='CLERK', sal, null) as CLERK,
+			if (job='MANAGER', sal, null) as MANAGER,
+			if (job='PRESIDENT', sal, null) as PRESIDENT,
+			if (job='ANALYST', sal, null) as ANALYST,
+			if (job='SALESMAN', sal, null) as SALESMAN
+	from emp;
 
 ------------------------------------------------------------------ 
 -- 집합 연산자
