@@ -99,49 +99,55 @@ from country co join (select countrycode, name, population
 # 먼저 KOR의 seoul의 인구를 찾아야 한다.
 select population from city where CountryCode='KOR' and name='seoul';
 # 위 sub query를 이용해 main query 를 작성한다.
-select __________, name, population 
+select CountryCode, name, population 
 from city where population > (select population from city where CountryCode='KOR' and name='seoul');
 
 # 13. San Miguel 이라는 도시에 사는 사람들이 사용하는 공식 언어는?
 # 다중행 sub query를 이용한다.
 # 먼저 san miguel이 어떤 나라에 있는지 확인이 필요하다.
-select __________ from city where name='___ ______';  # 총 3건의 row가 반환된다.
+select countrycode from city where name='san miguel';  # 총 3건의 row가 반환된다.
 # 이제 이 나라들의 공식 언어를 살펴보자.
-select __________, language
+select CountryCode, language
 from countrylanguage
-where __________ __ (select __________ from city where name='___ ______') and ________='_';
+where CountryCode IN (select countrycode from city where name='san miguel') and IsOfficial='T';
 
 # 14. 국가 코드와 해당 국가의 최대 인구수를 출력하시오. 국가 코드로 정렬한다.(232건)
-select __________, ____(population) "max_pop" 
+# 이거 문제가 이상해요. 국가 코드와 해당 국가에 속한 도시들 중 최대 인구수를 출력하고, 국가 코드로 정렬하시오. 라고 고치는게 맞을듯.
+# 문제에서는 해당 국가의 최대 인구수를 출력하랬는데 막상 답은 그 국가의 도시 중에서 가장 많은 인구수를 가진 도시의 인구수를 출력하게 되어있음.
+select CountryCode, max(population) "max_pop" 
 from city  
-________ __________
-________ __________;
+group by CountryCode
+order by countrycode;
 
 # 15. 국가별로 가장 인구가 많은 도시의 정보를 출력하시오. 국가 코드로 정렬한다.(232건)
-select __________, name, population 
+select CountryCode, name, population 
 from city 
-where (__________, population) __ (select __________, ____(population) from city  ________ __________)
-________ __________;
+where (countrycode, population) IN (select countrycode, max(population) from city  group by countrycode)
+order by countrycode;
 
 # 16. 국가 이름과 함께 국가별로 가장 인구가 많은 도시의 정보를 출력하시오. (239건)
+# 대체 왜 문제에 "도시가 없는 국가는 null로 채워라"나 "모든 국가에 대해"라고 이야기하지 않고 left join을 하길 바라는 거야.. 개발자 국어가 따로 있나?
 select co.code, co.name, t.name, t.population
-from country co __________ (select __________, name, population 
+from country co left join (select countrycode, name, population 
 							  from city 
-							  where (__________, population) __ 
-								(select __________, ____(population) 
-								from city  ________ __________)
-                          ) t ____ co.code=t._________;
+							  where (countrycode, population) in 
+								(select countrycode, max(population) 
+								from city  group by countrycode)
+                          ) t on co.code=t.countrycode;
 
 # 17. 위 쿼리의 내용이 자주 사용된다. 재사용을 위해 위 쿼리의 내용을 summary라는 이름의 view로 생성하시오.
 # view를 생성하기 위해 create or replace view <view name> as <select 쿼리> 를 사용한다.
-______ __ _______ view _______
+# 오답노트: 뷰에서 같은 컬럼은 이름 쓸 수 없다. -> 별칭으로 구분해줘야 함.
+create or replace view summary
 as 
-select co.code, co.name "co_name", t.name "ci_name", t.population
-from country co __________ (select __________, name, population 
+select co.code, co.name as co_name, t.name as ci_name, t.population
+from country co left join (select countrycode, name, population 
 							  from city 
-							  where (__________, population) __ (select __________, ____(population) from city  ________ __________)
-                          ) t ____ co.code=t._________;
+							  where (countrycode, population) in 
+								(select countrycode, max(population) 
+								from city  group by countrycode)
+                          ) t on co.code=t.countrycode;
 
 # 18. summary에서 KOR의 대표도시를 조회하시오.
 # view에서 조회할 때는 일반적인 테이블을 사용하는 것과 동일하다.
-select _ from _______ where code='___';
+select * from summary where code='KOR';
